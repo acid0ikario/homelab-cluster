@@ -29,6 +29,8 @@ create_cluster = local.Command(
         f"k3d cluster create {cluster_name} "
         f"--servers 1 --agents {agents} "
         f"--port '80:80@loadbalancer' --port '443:443@loadbalancer' "
+        # Disable k3s' bundled Traefik so ingress-nginx owns ports 80/443.
+        f"--k3s-arg '--disable=traefik@server:*' "
         f"--wait"
     ),
     delete=f"k3d cluster delete {cluster_name}",
