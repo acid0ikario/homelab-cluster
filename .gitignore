@@ -1,6 +1,3 @@
-# Pulumi
-Pulumi.*.yaml
-venv/
-__pycache__/
-*.pyc
-.pulumi/
+# kubeconfig dumps
+kubeconfig*
+*.kubeconfig
