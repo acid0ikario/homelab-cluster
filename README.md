@@ -63,13 +63,32 @@ make down        # deletes the k3d cluster entirely
 | `Makefile` | `up` / `down` / `status` / `password` / `urls` targets |
 | `bootstrap/root-app.yaml` | The app-of-apps root Application ArgoCD starts from |
 
-## Browser URLs (after `make urls`)
+## Browser URLs (via Ingress)
+
+The platform exposes services through **ingress-nginx** on `*.homelab.local`.
+Add these hostnames to your hosts file first (one-time):
+
+**Windows** — `C:\Windows\System32\drivers\etc\hosts` (edit as Administrator):
+```
+127.0.0.1 argocd.homelab.local grafana.homelab.local prometheus.homelab.local garmindashboard.homelab.local
+```
+
+**Linux / WSL** — `/etc/hosts` (needs sudo):
+```
+127.0.0.1 argocd.homelab.local grafana.homelab.local prometheus.homelab.local garmindashboard.homelab.local
+```
+
+Then open in a browser:
 
 | Service | URL | Credentials |
 |---------|-----|-------------|
-| ArgoCD | http://localhost:8080 | `admin` / `make password` |
-| Grafana | http://localhost:3000 | `admin` / `changeme` |
-| Prometheus | http://localhost:9090 | — |
+| ArgoCD | http://argocd.homelab.local | `admin` / `make password` |
+| Grafana | http://grafana.homelab.local | `admin` / `changeme` |
+| Prometheus | http://prometheus.homelab.local | — |
+| garmindashboard | http://garmindashboard.homelab.local | — |
+
+No port-forwards needed — k3d maps ports 80/443 to localhost and ingress-nginx
+routes by hostname. The Ingress resources live in `homelab-workloads/ingress/`.
 
 ## Configuration
 

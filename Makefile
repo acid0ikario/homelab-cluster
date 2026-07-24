@@ -15,7 +15,7 @@ ARGOCD_CHART ?= 7.7.11
 
 .DEFAULT_GOAL := help
 
-.PHONY: help up cluster argocd bootstrap down status password urls wait-argocd
+.PHONY: help up cluster argocd bootstrap down status password urls hosts wait-argocd
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -62,14 +62,19 @@ password: ## Print the ArgoCD admin password
 	@kubectl -n $(ARGOCD_NS) get secret argocd-initial-admin-secret \
 		-o jsonpath='{.data.password}' | base64 -d; echo
 
-urls: ## Start port-forwards and print browser URLs
-	@echo "Starting port-forwards (Ctrl+C to stop)..."
+urls: ## Print browser URLs (served via Ingress)
+	@echo "Services are exposed via ingress-nginx on *.homelab.local"
 	@echo ""
-	@echo "  ArgoCD    → http://localhost:8080   (user: admin, pass: 'make password')"
-	@echo "  Grafana   → http://localhost:3000   (user: admin, pass: 'changeme')"
-	@echo "  Prometheus→ http://localhost:9090"
+	@echo "  ArgoCD          → http://argocd.homelab.local          (admin / 'make password')"
+	@echo "  Grafana         → http://grafana.homelab.local         (admin / changeme)"
+	@echo "  Prometheus      → http://prometheus.homelab.local"
+	@echo "  garmindashboard → http://garmindashboard.homelab.local"
 	@echo ""
-	@kubectl -n $(ARGOCD_NS) port-forward svc/argocd-server 8080:80 >/dev/null 2>&1 & \
-	 kubectl -n observability port-forward svc/kube-prometheus-stack-grafana 3000:80 >/dev/null 2>&1 & \
-	 kubectl -n observability port-forward svc/kube-prometheus-stack-prometheus 9090:9090 >/dev/null 2>&1 & \
-	 wait
+	@echo "If names don't resolve, add them to your hosts file:  make hosts"
+
+hosts: ## Print the hosts-file line to add for *.homelab.local
+	@echo "Add this line to your hosts file:"
+	@echo "  Windows: C:\\Windows\\System32\\drivers\\etc\\hosts  (as Administrator)"
+	@echo "  Linux/WSL: /etc/hosts  (sudo)"
+	@echo ""
+	@echo "127.0.0.1 argocd.homelab.local grafana.homelab.local prometheus.homelab.local garmindashboard.homelab.local"
